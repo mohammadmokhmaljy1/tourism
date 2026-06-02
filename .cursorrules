@@ -1,0 +1,47 @@
+# Project Context
+This project is a RESTful API (v1) for a Tourism Application, built strictly using Native PHP and PDO (MySQL/phpMyAdmin).
+Brand/Namespace Context: DEVMMND COMPANY
+
+# Architecture & Design Pattern
+- Use an MVC-inspired architecture tailored for APIs (Router -> Controller -> Repository).
+- Use the **Repository Pattern** to handle all database queries using PDO. Keep controllers clean and focused only on HTTP request/response handling and validation.
+- The structure must be exceptionally easy to understand, well-commented, and maintainable. No JWT or complex authentication patterns.
+
+# Recommended Folder Structure
+/api
+  /v1
+    /config        (Database.php for PDO connection, cors.php)
+    /controllers   (e.g., PlaceController.php)
+    /repositories  (e.g., PlaceRepository.php - handles SQL & JOINs)
+    /utils         (Response.php for standardized JSON formats, Validator.php)
+    index.php      (Main routing entry point)
+
+# Routing & HTTP Methods
+All endpoints must follow strict RESTful conventions:
+- `GET /api/v1/{entity}` : Get all records. MUST include pagination (e.g., `?page=1&limit=10`) and search functionality (e.g., `?search=keyword`).
+- `GET /api/v1/{entity}/{id}` : Get a single record by ID.
+- `POST /api/v1/{entity}` : Create a new record.
+- `PUT /api/v1/{entity}/{id}` : Update an existing record completely.
+- `DELETE /api/v1/{entity}/{id}` : Delete a record.
+
+# Database & PDO Rules
+- **CRITICAL:** ALWAYS use PDO Prepared Statements (`prepare`, `bindParam`/`execute`) for ALL database interactions to prevent SQL Injection.
+- For queries involving foreign keys (e.g., `places` table querying `category_id`), ALWAYS use `SQL JOIN` statements to return meaningful associated data (e.g., returning `category_name` and `category_icon` alongside the place data).
+- strictly respect database schema constraints (e.g., `ALLOW NULL`).
+
+# Validation & Data Handling
+- Validate all incoming raw JSON inputs (`file_get_contents("php://input")`).
+- Check for required fields strictly.
+- If an optional field (allowed null in DB) is not provided, safely insert `NULL` using PDO.
+
+# Standardized JSON Response & HTTP Codes
+- ALWAYS set `Content-Type: application/json; charset=UTF-8`.
+- Use correct HTTP Status Codes for every response (200 OK, 201 Created, 400 Bad Request, 404 Not Found, 422 Unprocessable Entity, 500 Internal Server Error).
+- All API responses MUST follow this exact exact structure:
+```json
+{
+  "status": 200,
+  "success": true,
+  "message": "Clear and descriptive message regarding the operation",
+  "data": { ... } // Object, Array, or null
+}

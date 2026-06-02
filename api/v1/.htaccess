@@ -1,0 +1,12 @@
+# DEVMMND COMPANY - Tourism API (v1)
+# Route every request that is not a real file/folder to index.php,
+# which acts as the single entry point (front controller).
+
+RewriteEngine On
+
+# Do not rewrite requests that point to an existing file or directory.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Send everything else to the router.
+RewriteRule ^ index.php [QSA,L]
