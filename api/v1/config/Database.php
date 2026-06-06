@@ -14,9 +14,9 @@ class Database
     // --- Connection credentials (adjust to match your environment) ---
     private const HOST    = '127.0.0.1';
     private const PORT    = '3306';
-    private const DB_NAME = 'tourism';
-    private const USER    = 'root';
-    private const PASS    = '';
+    private const DB_NAME = 'u696050269_tourism_db';
+    private const USER    = 'u696050269_tourism_user';
+    private const PASS    = 'O8|yq=NMl7s|';
     private const CHARSET = 'utf8mb4';
 
     /**
