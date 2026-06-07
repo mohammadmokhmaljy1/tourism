@@ -13,7 +13,7 @@
  *   description     TEXT             NULL
  *   category_id     BIGINT UNSIGNED  NOT NULL (FK -> categories.id)
  *   address         VARCHAR(255)     NULL
- *   google_maps_url TEXT             NULL
+ *   Maps_url TEXT             NULL
  *   average_rating  DECIMAL(3,2)     DEFAULT 0.00
  *   reviews_count   INT UNSIGNED     DEFAULT 0
  *   price_level     TINYINT UNSIGNED NULL  (1..5)
@@ -39,7 +39,7 @@ class PlaceRepository
             c.name  AS category_name,
             c.icon  AS category_icon,
             p.address,
-            p.google_maps_url,
+            p.Maps_url,
             p.average_rating,
             p.reviews_count,
             p.price_level,
@@ -141,9 +141,9 @@ class PlaceRepository
     public function create(array $data): int
     {
         $sql = "INSERT INTO places
-                    (name, description, category_id, address, google_maps_url, price_level, status)
+                    (name, description, category_id, address, Maps_url, price_level, status)
                 VALUES
-                    (:name, :description, :category_id, :address, :google_maps_url, :price_level, :status)";
+                    (:name, :description, :category_id, :address, :Maps_url, :price_level, :status)";
 
         $stmt = $this->db->prepare($sql);
         $this->bindWritableColumns($stmt, $data);
@@ -165,7 +165,7 @@ class PlaceRepository
                     description     = :description,
                     category_id     = :category_id,
                     address         = :address,
-                    google_maps_url = :google_maps_url,
+                    Maps_url = :Maps_url,
                     price_level     = :price_level,
                     status          = :status
                 WHERE id = :id";
@@ -212,7 +212,7 @@ class PlaceRepository
         // Nullable text columns.
         $this->bindNullableString($stmt, ':description', $data['description'] ?? null);
         $this->bindNullableString($stmt, ':address', $data['address'] ?? null);
-        $this->bindNullableString($stmt, ':google_maps_url', $data['google_maps_url'] ?? null);
+        $this->bindNullableString($stmt, ':Maps_url', $data['Maps_url'] ?? null);
 
         // Nullable integer column (price_level, 1..5).
         $priceLevel = $data['price_level'] ?? null;

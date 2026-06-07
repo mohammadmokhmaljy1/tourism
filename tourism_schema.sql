@@ -39,7 +39,7 @@ CREATE TABLE `places` (
   `description` TEXT DEFAULT NULL,
   `category_id` BIGINT UNSIGNED NOT NULL,
   `address` VARCHAR(255) DEFAULT NULL,
-  `google_maps_url` TEXT DEFAULT NULL,
+  `Maps_url` TEXT DEFAULT NULL,
   `average_rating` DECIMAL(3,2) DEFAULT 0.00,
   `reviews_count` INT UNSIGNED DEFAULT 0,
   `price_level` TINYINT UNSIGNED CHECK (`price_level` BETWEEN 1 AND 5),

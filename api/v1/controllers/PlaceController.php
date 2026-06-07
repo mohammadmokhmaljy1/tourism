@@ -154,7 +154,7 @@ class PlaceController extends BaseController
             'category_id'     => $categoryId,
             'description'     => $this->optionalString($data, 'description'),
             'address'         => $this->optionalString($data, 'address'),
-            'google_maps_url' => $this->optionalString($data, 'google_maps_url'),
+            'Maps_url' => $this->optionalString($data, 'Maps_url'),
             'price_level'     => $this->optionalInt($data, 'price_level'),
             'status'          => isset($data['status']) && $data['status'] !== ''
                 ? (string) $data['status']
