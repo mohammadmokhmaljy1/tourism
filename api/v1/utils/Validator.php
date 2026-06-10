@@ -127,6 +127,26 @@ class Validator
     }
 
     /**
+     * Field, when present and not empty, must be a number within range.
+     * Accepts integers and decimals (e.g. latitude/longitude).
+     */
+    public function numericBetween(string $field, float $min, float $max, string $label = null): self
+    {
+        $label = $label ?? $field;
+        $value = $this->data[$field] ?? null;
+
+        if ($value !== null && $value !== '') {
+            if (!is_numeric($value)) {
+                $this->errors[$field] = "The {$label} must be a valid number.";
+            } elseif ((float) $value < $min || (float) $value > $max) {
+                $this->errors[$field] = "The {$label} must be between {$min} and {$max}.";
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Field, when present and not empty, must be one of the allowed values.
      *
      * @param array<int,string> $allowed

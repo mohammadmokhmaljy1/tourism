@@ -113,6 +113,21 @@ abstract class BaseController
     }
 
     /**
+     * Float for an optional field, or NULL when missing/blank
+     * (maps cleanly to a nullable DECIMAL column, e.g. lat/lng).
+     *
+     * @param array<string,mixed> $data
+     */
+    protected function optionalFloat(array $data, string $field): ?float
+    {
+        if (!isset($data[$field]) || $data[$field] === '') {
+            return null;
+        }
+
+        return (float) $data[$field];
+    }
+
+    /**
      * Normalizes a "boolean-ish" input (true/false, 1/0, "true"/"false")
      * into an int 0/1 suitable for a TINYINT/BOOLEAN column.
      *

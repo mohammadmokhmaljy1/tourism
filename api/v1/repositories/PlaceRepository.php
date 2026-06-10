@@ -14,6 +14,8 @@
  *   category_id     BIGINT UNSIGNED  NOT NULL (FK -> categories.id)
  *   address         VARCHAR(255)     NULL
  *   Maps_url TEXT             NULL
+ *   lat             DECIMAL(10,8)    NULL
+ *   lng             DECIMAL(11,8)    NULL
  *   average_rating  DECIMAL(3,2)     DEFAULT 0.00
  *   reviews_count   INT UNSIGNED     DEFAULT 0
  *   price_level     TINYINT UNSIGNED NULL  (1..5)
@@ -40,6 +42,8 @@ class PlaceRepository
             c.icon  AS category_icon,
             p.address,
             p.Maps_url,
+            p.lat,
+            p.lng,
             p.average_rating,
             p.reviews_count,
             p.price_level,
@@ -141,9 +145,9 @@ class PlaceRepository
     public function create(array $data): int
     {
         $sql = "INSERT INTO places
-                    (name, description, category_id, address, Maps_url, price_level, status)
+                    (name, description, category_id, address, Maps_url, lat, lng, price_level, status)
                 VALUES
-                    (:name, :description, :category_id, :address, :Maps_url, :price_level, :status)";
+                    (:name, :description, :category_id, :address, :Maps_url, :lat, :lng, :price_level, :status)";
 
         $stmt = $this->db->prepare($sql);
         $this->bindWritableColumns($stmt, $data);
@@ -166,6 +170,8 @@ class PlaceRepository
                     category_id     = :category_id,
                     address         = :address,
                     Maps_url = :Maps_url,
+                    lat             = :lat,
+                    lng             = :lng,
                     price_level     = :price_level,
                     status          = :status
                 WHERE id = :id";
@@ -214,6 +220,11 @@ class PlaceRepository
         $this->bindNullableString($stmt, ':address', $data['address'] ?? null);
         $this->bindNullableString($stmt, ':Maps_url', $data['Maps_url'] ?? null);
 
+        // Nullable decimal columns (geo coordinates). Bound as strings so the
+        // full precision reaches the DECIMAL columns intact.
+        $this->bindNullableString($stmt, ':lat', isset($data['lat']) && $data['lat'] !== null ? (string) $data['lat'] : null);
+        $this->bindNullableString($stmt, ':lng', isset($data['lng']) && $data['lng'] !== null ? (string) $data['lng'] : null);
+
         // Nullable integer column (price_level, 1..5).
         $priceLevel = $data['price_level'] ?? null;
         if ($priceLevel === null) {
@@ -253,6 +264,8 @@ class PlaceRepository
         $row['reviews_count'] = (int) $row['reviews_count'];
         $row['average_rating'] = (float) $row['average_rating'];
         $row['price_level']   = $row['price_level'] !== null ? (int) $row['price_level'] : null;
+        $row['lat']           = isset($row['lat']) && $row['lat'] !== null ? (float) $row['lat'] : null;
+        $row['lng']           = isset($row['lng']) && $row['lng'] !== null ? (float) $row['lng'] : null;
 
         return $row;
     }

@@ -133,7 +133,10 @@ class PlaceController extends BaseController
             ->positiveInteger('category_id')
             ->maxLength('address', 255)
             ->intBetween('price_level', 1, 5)
-            ->inList('status', self::STATUSES);
+            ->inList('status', self::STATUSES)
+            // Geo coordinates (optional). lat: -90..90, lng: -180..180.
+            ->numericBetween('lat', -90, 90)
+            ->numericBetween('lng', -180, 180);
 
         if ($validator->fails()) {
             Response::unprocessable('Validation failed.', $validator->errors());
@@ -154,8 +157,10 @@ class PlaceController extends BaseController
             'category_id'     => $categoryId,
             'description'     => $this->optionalString($data, 'description'),
             'address'         => $this->optionalString($data, 'address'),
-            'Maps_url' => $this->optionalString($data, 'Maps_url'),
+            'Maps_url'        => $this->optionalString($data, 'Maps_url'),
             'price_level'     => $this->optionalInt($data, 'price_level'),
+            'lat'             => $this->optionalFloat($data, 'lat'),
+            'lng'             => $this->optionalFloat($data, 'lng'),
             'status'          => isset($data['status']) && $data['status'] !== ''
                 ? (string) $data['status']
                 : 'Open',
