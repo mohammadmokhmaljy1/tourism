@@ -19,6 +19,8 @@ require_once __DIR__ . '/config/cors.php';        // Headers + OPTIONS handling.
 require_once __DIR__ . '/config/Database.php';     // PDO connection.
 require_once __DIR__ . '/utils/Response.php';      // Standardized JSON output.
 require_once __DIR__ . '/utils/Validator.php';     // Input validation helper.
+require_once __DIR__ . '/config/JwtConfig.php';    // JWT settings.
+require_once __DIR__ . '/utils/Jwt.php';           // JWT encode/decode.
 
 // BaseController must be loaded before any controller that extends it.
 require_once __DIR__ . '/controllers/BaseController.php';
@@ -28,7 +30,9 @@ require_once __DIR__ . '/controllers/CategoryController.php';
 require_once __DIR__ . '/repositories/PlaceRepository.php';
 require_once __DIR__ . '/controllers/PlaceController.php';
 require_once __DIR__ . '/repositories/UserRepository.php';
+require_once __DIR__ . '/repositories/RevokedTokenRepository.php';
 require_once __DIR__ . '/controllers/UserController.php';
+require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/repositories/AmenityRepository.php';
 require_once __DIR__ . '/controllers/AmenityController.php';
 require_once __DIR__ . '/repositories/PlaceImageRepository.php';
@@ -71,11 +75,54 @@ try {
         Response::ok('Welcome to the DEVMMND Tourism API v1.', [
             'version'   => 'v1',
             'endpoints' => [
-                'categories', 'places', 'users', 'amenities',
-                'place-images', 'place-contacts', 'working-hours',
-                'favorites', 'reviews', 'place-amenities',
+                'auth (register, login, me, logout)', 'categories', 'places',
+                'users', 'amenities', 'place-images', 'place-contacts',
+                'working-hours', 'favorites', 'reviews', 'place-amenities',
             ],
         ]);
+    }
+
+    // --- Auth routes (JWT) — custom actions, not generic CRUD --------------
+    if ($entity === 'auth') {
+        $authController = new AuthController();
+        $action         = $id ?? '';
+
+        switch ($action) {
+            case 'register':
+                if ($method !== 'POST') {
+                    Response::methodNotAllowed('Use POST for /auth/register.');
+                }
+                $authController->register();
+                break;
+
+            case 'login':
+                if ($method !== 'POST') {
+                    Response::methodNotAllowed('Use POST for /auth/login.');
+                }
+                $authController->login();
+                break;
+
+            case 'me':
+                if ($method !== 'GET') {
+                    Response::methodNotAllowed('Use GET for /auth/me.');
+                }
+                $authController->me();
+                break;
+
+            case 'logout':
+                if ($method !== 'POST') {
+                    Response::methodNotAllowed('Use POST for /auth/logout.');
+                }
+                $authController->logout();
+                break;
+
+            default:
+                Response::notFound(
+                    $action === ''
+                        ? 'Auth action is required. Available: register, login, me, logout.'
+                        : "Auth action '{$action}' was not found."
+                );
+        }
     }
 
     // --- Route table: map {entity} to its controller -----------------------

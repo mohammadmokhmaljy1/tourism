@@ -93,6 +93,28 @@ class UserRepository
     }
 
     /**
+     * Finds an active user by email, including the password hash.
+     * Used only by the auth login flow — never expose the result directly.
+     *
+     * @return array<string,mixed>|null
+     */
+    public function findByEmailForAuth(string $email): ?array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, name, email, password, role, profile_picture, status
+             FROM users
+             WHERE email = :email AND deleted_at IS NULL
+             LIMIT 1'
+        );
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+
+        return $row !== false ? $this->castRow($row) : null;
+    }
+
+    /**
      * Finds a single active user by id (password excluded).
      *
      * @return array<string,mixed>|null

@@ -55,6 +55,12 @@ class Response
         self::send(201, true, $message, $data);
     }
 
+    /** 401 Unauthorized - Missing or invalid authentication. */
+    public static function unauthorized(string $message, $data = null): void
+    {
+        self::send(401, false, $message, $data);
+    }
+
     /** 400 Bad Request - Malformed request (e.g. invalid JSON, bad id). */
     public static function badRequest(string $message, $data = null): void
     {

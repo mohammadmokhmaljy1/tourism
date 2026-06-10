@@ -144,5 +144,15 @@ CREATE TABLE `reviews` (
 ALTER TABLE places ADD COLUMN lat DECIMAL(10, 8);
 ALTER TABLE places ADD COLUMN lng DECIMAL(11, 8);
 
+-- --------------------------------------------------------
+-- 12. جدول التوكنات الملغاة (Revoked Tokens — JWT logout)
+-- --------------------------------------------------------
+CREATE TABLE `revoked_tokens` (
+  `jti` VARCHAR(64) NOT NULL,
+  `expires_at` TIMESTAMP NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`jti`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- إعادة تفعيل فحص العلاقات
 SET FOREIGN_KEY_CHECKS = 1;
