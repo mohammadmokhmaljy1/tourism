@@ -4,6 +4,17 @@
 
 RewriteEngine On
 
+# ---------------------------------------------------------------------------
+# Forward the Authorization header to PHP.
+# Many shared hosts (Hostinger / LiteSpeed) strip it and return 403 on GET.
+# ---------------------------------------------------------------------------
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
 # Do not rewrite requests that point to an existing file or directory.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

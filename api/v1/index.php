@@ -103,6 +103,7 @@ try {
                 break;
 
             case 'me':
+            case 'profile':
                 if ($method !== 'GET') {
                     Response::methodNotAllowed('Use GET for /auth/me.');
                 }

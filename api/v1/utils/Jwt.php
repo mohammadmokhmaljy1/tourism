@@ -83,24 +83,23 @@ class Jwt
     }
 
     /**
-     * Reads the Bearer token from the Authorization header.
+     * Reads the JWT from the request.
+     *
+     * Priority:
+     *   1. Authorization: Bearer {token}
+     *   2. X-Auth-Token: {token}  (fallback when the host blocks Authorization)
      */
     public static function bearerToken(): ?string
     {
-        $header = $_SERVER['HTTP_AUTHORIZATION']
-            ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
-            ?? '';
+        $authHeader = self::requestHeader('Authorization');
 
-        if ($header === '' && function_exists('apache_request_headers')) {
-            $headers = apache_request_headers();
-            $header  = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        if ($authHeader !== null && preg_match('/^Bearer\s+(\S+)$/i', $authHeader, $matches)) {
+            return $matches[1];
         }
 
-        if (!preg_match('/^Bearer\s+(\S+)$/i', trim($header), $matches)) {
-            return null;
-        }
+        $xAuthToken = self::requestHeader('X-Auth-Token');
 
-        return $matches[1];
+        return ($xAuthToken !== null && $xAuthToken !== '') ? $xAuthToken : null;
     }
 
     /**
@@ -113,10 +112,42 @@ class Jwt
         $token = self::bearerToken();
 
         if ($token === null) {
-            Response::unauthorized('Authorization token is required.');
+            Response::unauthorized(
+                'Authorization token is required. Send Authorization: Bearer {token} or X-Auth-Token: {token}.'
+            );
         }
 
         return self::decode($token);
+    }
+
+    /**
+     * Reads a request header in a way that works across Apache, LiteSpeed, and CGI.
+     */
+    private static function requestHeader(string $name): ?string
+    {
+        $serverKey = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+
+        if (!empty($_SERVER[$serverKey])) {
+            return trim((string) $_SERVER[$serverKey]);
+        }
+
+        if (strcasecmp($name, 'Authorization') === 0 && !empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            return trim((string) $_SERVER['REDIRECT_HTTP_AUTHORIZATION']);
+        }
+
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+
+            if (is_array($headers)) {
+                foreach ($headers as $key => $value) {
+                    if (strcasecmp((string) $key, $name) === 0) {
+                        return trim((string) $value);
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
