@@ -1,7 +1,7 @@
 <?php
 /**
  * DEVMMND COMPANY - Tourism API (v1)
- * -------------------------------------------------------------
+ * -----------------------------------------------------------
  * Database.php
  * Handles a single, secure PDO connection to the MySQL database.
  *
